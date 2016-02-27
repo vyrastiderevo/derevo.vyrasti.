@@ -1,0 +1,84 @@
+import numpy as np
+import pygame as pg, sys
+from pygame.locals import *
+
+pg.init()
+DISPLAYSURF = pg.display.set_mode((600, 500))
+pg.display.set_caption('pidorasity')
+
+#Set up colours
+black = (0, 0, 0)
+blue = (0, 0, 255)
+gray = (128, 128, 128)
+red = (255, 0, 0)
+silver = (192,192,192)
+white = (255,255,255)
+
+number=10
+dis=25
+h=200 #distance to ecran
+dcen=400 #distance to center of cube
+radius=15
+		
+# fill cube
+cube=[[]]
+for ix in range(number):
+    for iy in range(number):
+        for iz in range(number):
+            cube+=[[(ix-number/2)*dis,(iy-number/2)*dis,(iz-number/2)*dis]]
+cube.pop(0)
+
+
+gamma=0
+clock = pg.time.Clock()
+while True: # main game loop
+
+    for event in pg.event.get():
+        if event.type == QUIT:
+            pg.quit()
+            sys.exit()
+
+    #some algorithm for rotation
+    alpha1=0.1*np.sin(gamma)
+    alpha2=0.1*np.sin(gamma+1)
+    alpha3=0.1*np.sin(gamma+2)
+
+    mat1=[[np.cos(alpha1),-np.sin(alpha1)],[np.sin(alpha1),np.cos(alpha1)]]
+    mat2=[[np.cos(alpha2),-np.sin(alpha2)],[np.sin(alpha2),np.cos(alpha2)]]
+    mat3=[[np.cos(alpha3),-np.sin(alpha3)],[np.sin(alpha3),np.cos(alpha3)]]
+
+    for i in range(len(cube)):
+        [[cube[i][0]],[cube[i][1]]]=np.dot(mat1,[[cube[i][0]],[cube[i][1]]])
+        [[cube[i][1]],[cube[i][2]]]=np.dot(mat2,[[cube[i][1]],[cube[i][2]]])
+        [[cube[i][2]],[cube[i][0]]]=np.dot(mat3,[[cube[i][2]],[cube[i][0]]])
+    gamma+=0.1
+
+    #sort for z
+    dict={}
+    list=[]
+    otrisovka=[[]]
+    for point in cube:
+        key=point[2]
+        while key in dict:
+            key+=0.01
+        dict[key]=point
+        list+=[key]
+    list.sort(reverse=True)
+    
+    for z in list:
+        otrisovka+=[dict[z]]
+    otrisovka.pop(0)
+
+    DISPLAYSURF.fill(black)
+    #draw
+    for point in otrisovka:
+        coef=h/(point[2]+dcen)
+        xpos=int(round(point[0]*coef))+300
+        ypos=int(round(point[1]*coef))+250
+        pos=(xpos,ypos)
+        r=int(round(radius*coef))
+        pg.draw.circle(DISPLAYSURF,red,pos,r,0)
+        pg.draw.circle(DISPLAYSURF,white,pos,r,1)
+
+    pg.display.update()
+    clock.tick(30)
