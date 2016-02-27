@@ -77,7 +77,7 @@ while True: # main game loop
         pos=(xpos,ypos) #position of the center of circle in the screen
         r=int(round(radius*coef))
         pg.draw.circle(DISPLAYSURF,red,pos,r,0)
-        pg.draw.circle(DISPLAYSURF,white,pos,r,1)
+        pg.draw.circle(DISPLAYSURF,silver,pos,r,1)
 
     pg.display.update()
     clock.tick(30)
