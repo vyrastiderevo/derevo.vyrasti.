@@ -4,7 +4,7 @@ from pygame.locals import *
 
 pg.init()
 DISPLAYSURF = pg.display.set_mode((600, 500))
-pg.display.set_caption('pidorasity')
+pg.display.set_caption('raspidarasilo-like pseudo3D')
 
 #Set up colours
 black = (0, 0, 0)
@@ -15,7 +15,7 @@ number=10 #number of objects in cube's side
 dis=25 #distance between neighboring elements in cube
 h=200 #distance from camera to "screen"
 dcen=400 #distance from camera to center of cube
-radius=15 #radius of circle
+radius=15
 		
 # fill cube with initial coordinates of elements
 cube=[[]]
