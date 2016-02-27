@@ -8,19 +8,16 @@ pg.display.set_caption('pidorasity')
 
 #Set up colours
 black = (0, 0, 0)
-blue = (0, 0, 255)
-gray = (128, 128, 128)
 red = (255, 0, 0)
 silver = (192,192,192)
-white = (255,255,255)
 
-number=10
-dis=25
-h=200 #distance to ecran
-dcen=400 #distance to center of cube
-radius=15
+number=10 #number of objects in cube's side
+dis=25 #distance between neighboring elements in cube
+h=200 #distance from camera to "screen"
+dcen=400 #distance from camera to center of cube
+radius=15 #radius of circle
 		
-# fill cube
+# fill cube with initial coordinates of elements
 cube=[[]]
 for ix in range(number):
     for iy in range(number):
@@ -28,8 +25,7 @@ for ix in range(number):
             cube+=[[(ix-number/2)*dis,(iy-number/2)*dis,(iz-number/2)*dis]]
 cube.pop(0)
 
-
-gamma=0
+gamma=0 #angle to give a "sinusoidal pattern" to the rotation angles
 clock = pg.time.Clock()
 while True: # main game loop
 
@@ -38,44 +34,45 @@ while True: # main game loop
             pg.quit()
             sys.exit()
 
-    #some algorithm for rotation
-    alpha1=0.1*np.sin(gamma)
-    alpha2=0.1*np.sin(gamma+1)
-    alpha3=0.1*np.sin(gamma+2)
+    #algorithm for rotation
+    alpha1=0.1*np.sin(gamma) #angle of rotation around z
+    alpha2=0.1*np.sin(gamma+1) #angle of rotation around x
+    alpha3=0.1*np.sin(gamma+2) #angle of rotation around y
 
-    mat1=[[np.cos(alpha1),-np.sin(alpha1)],[np.sin(alpha1),np.cos(alpha1)]]
-    mat2=[[np.cos(alpha2),-np.sin(alpha2)],[np.sin(alpha2),np.cos(alpha2)]]
-    mat3=[[np.cos(alpha3),-np.sin(alpha3)],[np.sin(alpha3),np.cos(alpha3)]]
+    mat1=[[np.cos(alpha1),-np.sin(alpha1)],[np.sin(alpha1),np.cos(alpha1)]] #matrix of rotation around z
+    mat2=[[np.cos(alpha2),-np.sin(alpha2)],[np.sin(alpha2),np.cos(alpha2)]] #matrix of rotation around x
+    mat3=[[np.cos(alpha3),-np.sin(alpha3)],[np.sin(alpha3),np.cos(alpha3)]] #matrix of rotation around y
 
+    #apply rotation matrices to each element in cube
     for i in range(len(cube)):
         [[cube[i][0]],[cube[i][1]]]=np.dot(mat1,[[cube[i][0]],[cube[i][1]]])
         [[cube[i][1]],[cube[i][2]]]=np.dot(mat2,[[cube[i][1]],[cube[i][2]]])
         [[cube[i][2]],[cube[i][0]]]=np.dot(mat3,[[cube[i][2]],[cube[i][0]]])
-    gamma+=0.1
+    gamma+=0.1 #increase gamma
 
-    #sort for z
+    #sort elements of cube by z to draw them in the right order
     dict={}
     list=[]
-    otrisovka=[[]]
+    sortedcube=[[]]
     for point in cube:
         key=point[2]
         while key in dict:
-            key+=0.01
+            key+=0.01 #crutch to avoid repetition of keys
         dict[key]=point
         list+=[key]
     list.sort(reverse=True)
     
     for z in list:
-        otrisovka+=[dict[z]]
-    otrisovka.pop(0)
+        sortedcube+=[dict[z]]
+    sortedcube.pop(0)
 
     DISPLAYSURF.fill(black)
     #draw
-    for point in otrisovka:
-        coef=h/(point[2]+dcen)
+    for point in sortedcube:
+        coef=h/(point[2]+dcen) #coefficient of perspective diminution
         xpos=int(round(point[0]*coef))+300
         ypos=int(round(point[1]*coef))+250
-        pos=(xpos,ypos)
+        pos=(xpos,ypos) #position of the center of circle in the screen
         r=int(round(radius*coef))
         pg.draw.circle(DISPLAYSURF,red,pos,r,0)
         pg.draw.circle(DISPLAYSURF,white,pos,r,1)
