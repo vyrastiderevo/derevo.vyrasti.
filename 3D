@@ -48,7 +48,9 @@ while True: # main game loop
         [[cube[i][0]],[cube[i][1]]]=np.dot(mat1,[[cube[i][0]],[cube[i][1]]])
         [[cube[i][1]],[cube[i][2]]]=np.dot(mat2,[[cube[i][1]],[cube[i][2]]])
         [[cube[i][2]],[cube[i][0]]]=np.dot(mat3,[[cube[i][2]],[cube[i][0]]])
-    gamma+=0.1 #increase gamma
+    gamma+=0.1
+    if gamma>np.pi*2:
+        gamma-=np.pi*2
 
     #sort elements of cube by z to draw them in the right order
     dict={}
