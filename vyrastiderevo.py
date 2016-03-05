@@ -45,13 +45,6 @@ def angle(x0,y0,x1,y1):
                 gamma=aatan+np.pi
     return gamma
 
-def rotmat(dx,dy): #rotation matrix that rotates ('line',x0,y0,dx,dy) to horisontal
-    mat=((dx,dy),(-dy,dx))/dist(0,0,dx,dy)
-    return mat
-def rotation(x,y,mat):
-    ((nx,),(ny,))=np.dot(mat,((x,),(y,)))
-    return (nx,ny)
-
 def arcplatform_intersection(arc,platform):
     xa=arc[0]
     ya=arc[1]
@@ -500,9 +493,10 @@ def vrt_collision(chpos,chpos_prev):
 
 def chintersline(chpos,line): #lazy function for intersection, there are false-positifs, sorry 
     l=dist(0,0,line[3],line[4])
-    mat=rotmat(line[3],line[4]) #rotation matrix
-    (xlv,ylv)=rotation(line[1],line[2],mat)#x and y of virtual start of line
-    (xchv,ychv)=rotation(chpos[0],chpos[1],mat) #x and y of virtual character
+    xlv=(line[3]*line[1]+line[4]*line[2])/l #'rotation matrix' algorithm
+    ylv=(line[3]*line[2]-line[4]*line[1])/l
+    xchv=(line[3]*chpos[0]+line[4]*chpos[1])/l
+    ychv=(line[3]*chpos[1]-line[4]*chpos[0])/l
     inters=(abs(ylv-ychv)<=chsize+width/2 and xlv-chsize<=xchv<=xlv+chsize+l)
     return inters
 
@@ -588,7 +582,7 @@ def line_rect(line):
     rectangle=pg.Rect(xmin,ymin,xmax-xmin,ymax-ymin)
     return rectangle
     
-def tree_pass(j,collidelist):
+def tree_pass(j,collidelist): #lazylazylazy
     jrect=tree1[j][6]
     for jj in range(j+2,len(tree1)):
         if jrect.colliderect(tree1[jj][6]):
@@ -701,10 +695,6 @@ while True: # main game loop
 
         chpos_prev=(chpos[0],chpos[1])
 
-        #print tree state
-        myprint(crdseed[0]-15,crdseed[1]-20,leftright[0])
-        myprint(crdseed[0]+9,crdseed[1]-20,leftright[1])
-
         if ch_place[4]=='plt':
             flag_tree=moveplt()
         else:
@@ -740,6 +730,10 @@ while True: # main game loop
                         pg.time.wait(500)
 
     chpos=vrt_collision(chpos,chpos_prev)
+
+    #print tree state
+    myprint(crdseed[0]-15,crdseed[1]-20,leftright[0])
+    myprint(crdseed[0]+9,crdseed[1]-20,leftright[1])
 
     pg.display.update()
     clock.tick()
